@@ -10,7 +10,7 @@ import qualified Network.URI as URI
 import qualified Data.Text as T
 import qualified System.Environment as E
 import System.Exit
-import qualified System.Command as C
+import qualified System.Process as P
 import Data.List
 
 type Book = (T.Text, T.Text)
@@ -34,7 +34,9 @@ main varName url = do
         cmdStr = T.unpack (T.concat cmdL)
 
     putStrLn (cmdStr)
-    C.Exit r <- C.cmd cmdStr
+    let process = P.shell cmdStr
+    r <- P.callCommand cmdStr
+    -- putStrLn $ show r
     -- putStrLn
     return ()
   where

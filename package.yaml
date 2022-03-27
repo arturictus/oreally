@@ -24,7 +24,7 @@ dependencies:
   - network-uri >= 2.7.0
   - bytestring
   - text
-  - command >= 0.1
+  - process >= 1.6.14
 
 library:
   source-dirs: src
