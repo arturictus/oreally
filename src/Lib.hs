@@ -2,7 +2,7 @@
 
 module Lib
     ( parseURI,
-      main,
+      buildCmd,
       buildAuth
     ) where
 
@@ -16,49 +16,30 @@ import Data.List
 type Book = (T.Text, T.Text)
 type Auth = (T.Text, T.Text)
 
--- instance Show a => Show (C.CmdResult a) where
---     show (C.CmdResult a) = show a
-
-main :: String -> String -> IO ()
-main varName url = do
-    putStrLn "setting up the project"
-    auth <- lookUp
-    putStrLn (show auth)
-    book <- parseURI' url
-    let cmdL = ["(docker run kirinnee/orly:latest login ",
-                (bookId book), " ",
-                (showAuth auth),
-                 ") > \"",
-                (booktitle book),
-                ".epub\""]
-        cmdStr = T.unpack (T.concat cmdL)
-
-    putStrLn (cmdStr)
-    -- FIX: do not run the command for now
-    -- r <- P.callCommand cmdStr
-    return ()
+buildCmd :: Book -> Auth -> FilePath -> String
+buildCmd book auth path =
+    T.unpack $ T.concat str
   where
-    lookUp = buildAuth <$> E.lookupEnv varName
-    parseURI' uri = case parseURI uri of
-      (Just b) -> return b
-      _ -> exitFailure
-
-    showAuth :: Maybe Auth -> T.Text
-    showAuth (Just (a, b)) = T.concat [a, ":", b]
-    showAuth _ = ""
+    str = ["(docker run kirinnee/orly:latest login ",
+          (bookId book), " ",
+          (showAuth auth),
+            ") > \"", (T.pack path), "/",
+          (booktitle book),
+          ".epub\""]
+    showAuth :: Auth -> T.Text
+    showAuth (a, b) = T.concat [a, ":", b]
     bookId (_, b) = b
     booktitle (a, _) = a
 
 
-buildAuth :: Maybe String -> Maybe Auth
+buildAuth :: String -> Maybe Auth
 buildAuth d = do
     l <- spl d
     auth <- build l
     return auth
   where
-    spl :: Maybe String -> Maybe [T.Text]
-    spl (Just var) = Just (T.splitOn ":" (T.pack var))
-    spl _ = Nothing
+    spl :: String -> Maybe [T.Text]
+    spl var = Just (T.splitOn ":" (T.pack var))
 
     build :: [T.Text] -> Maybe Auth
     build (username:pass:_) = Just (username, pass)
