@@ -22,6 +22,7 @@ spec = do
       buildAuth (Just "NOP") `shouldBe` Nothing
       buildAuth (Just "a:b") `shouldBe` Just ("a", "b")
     it "main" $ do
+      -- TODO: main should receive the password already
       -- E.setEnv "MY_VAR" "a:b"
       main "OREALLY_AUTH" "https://learning.oreilly.com/library/view/get-programming-with/9781617293764/"
       -- main "NOP" ""

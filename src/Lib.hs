@@ -34,10 +34,8 @@ main varName url = do
         cmdStr = T.unpack (T.concat cmdL)
 
     putStrLn (cmdStr)
-    let process = P.shell cmdStr
-    r <- P.callCommand cmdStr
-    -- putStrLn $ show r
-    -- putStrLn
+    -- FIX: do not run the command for now
+    -- r <- P.callCommand cmdStr
     return ()
   where
     lookUp = buildAuth <$> E.lookupEnv varName
