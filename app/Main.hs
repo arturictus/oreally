@@ -1,21 +1,15 @@
 module Main where
 import Options.Applicative
 import Data.Semigroup ((<>))
-import Data.Maybe ( fromMaybe )
-import System.Environment
 import qualified System.Environment as E
 import qualified System.Process as P
-import Debug.Trace
 import Lib
-
-
 
 data Options = Options
   { output :: FilePath
-  , auth :: String
+  , authVar :: String
+  , url :: String
   } deriving Show
-
-
 
 options :: Parser Options
 options = Options
@@ -27,23 +21,38 @@ options = Options
         <> value "~"
         <> showDefault)
     <*> strOption (
-        long "auth"
+        long "auth-var"
         <> short 'a'
-        <> metavar "USER:PASS"
-        <> value ""
-        <> help "authentication: username and password")
+        <> value "OREALLY_AUTH"
+        <> metavar "ENVVAR"
+        <> showDefault
+        <> help "auth ENV VAR: must be: `USERNAME:PASSWORD` format")
+    <*> argument str (metavar "URL" <> help "full o'reilly book url")
 
 main :: IO ()
 main = run =<< execParser opts
   where
     opts = info (options <**> helper)
       ( fullDesc
-        <> progDesc "desc blablabla"
-        <> header "header balabla")
+        <> progDesc "Download O'Reilly books to epub"
+        <> header "O'Reilly ----> epub == oreally!!")
 
 
 
 run :: Options -> IO ()
 run options = do
-  putStrLn $ show options
+    envAuth <- E.getEnv $ authVar options
+    auth <- maybeToIO "invalid AUTH" $ buildAuth envAuth
+    book <- maybeToIO "invalid URL" $ parseURI $ url options
+    let cmd = buildCmd book auth $ output options
+    putStrLn "Starting to download:"
+    putStrLn $ "  output folder: " ++ output options
+    putStrLn $ "  ENV VAR auth: " ++ authVar options
+    r <- P.callCommand cmd
+    return ()
+  where
+    maybeToIO :: String -> Maybe a -> IO a
+    maybeToIO _ (Just a) = do return a
+    maybeToIO txt _ = do ioError (userError txt)
+
 

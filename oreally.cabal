@@ -25,7 +25,6 @@ source-repository head
 
 library
   exposed-modules:
-      CliTest
       Lib
   other-modules:
       Paths_oreally
