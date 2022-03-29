@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      CliTest
       Lib
   other-modules:
       Paths_oreally
@@ -34,6 +35,7 @@ library
       base >=4.7 && <5
     , bytestring
     , network-uri >=2.7.0
+    , optparse-applicative >=0.17
     , process >=1.6.14
     , text
   default-language: Haskell2010
@@ -49,6 +51,7 @@ executable oreally-exe
       base >=4.7 && <5
     , bytestring
     , network-uri >=2.7.0
+    , optparse-applicative >=0.17
     , oreally
     , process >=1.6.14
     , text
@@ -69,6 +72,7 @@ test-suite oreally-test
     , hspec
     , hspec-discover
     , network-uri >=2.7.0
+    , optparse-applicative >=0.17
     , oreally
     , process >=1.6.14
     , text
